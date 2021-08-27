@@ -7,8 +7,8 @@ Gem::Specification.new do |s|
   s.add_dependency 'bigdecimal' # needed by reek
   s.add_dependency 'fasterer', '0.9.0'
   s.add_dependency 'reek', '6.0.3'
-  s.add_dependency 'rubocop', '1.18.3'
-  s.add_dependency 'rubocop-performance', '1.11.4'
+  s.add_dependency 'rubocop', '1.20.0'
+  s.add_dependency 'rubocop-performance', '1.11.5'
   s.add_dependency 'rubocop-rails', '2.11.3'
   s.add_dependency 'rubocop-rake', '0.6.0'
   s.add_dependency 'rubocop-rspec', '2.4.0'
