@@ -6,7 +6,7 @@ fail_fast: false
 
 repos:
   - repo: https://github.com/jumanjihouse/pre-commit-hooks
-    rev: 1.11.2
+    rev: 2.1.5
     hooks:
       - id: forbid-binary
         exclude: >
@@ -62,7 +62,6 @@ repos:
         entry: pre_commit_hooks/shellcheck
         types: [shell]
         args: [-e, SC1091]
-        additional_dependencies: [shellcheck]
 
       - id: shfmt
         name: shfmt (local)
@@ -70,10 +69,9 @@ repos:
         entry: pre_commit_hooks/shfmt
         types: [shell]
         args: ['-l', '-i', '2', '-ci']
-        additional_dependencies: [shfmt]
 
   - repo: https://github.com/adrienverge/yamllint.git
-    rev: v1.20.0
+    rev: v1.26.3
     hooks:
       - id: yamllint
         args: ['--format', 'parsable', '--strict']
@@ -90,13 +88,13 @@ repos:
       - id: flake8
 
   - repo: https://github.com/Lucas-C/pre-commit-hooks
-    rev: v1.1.7
+    rev: v1.1.10
     hooks:
       - id: forbid-crlf
       - id: forbid-tabs
 
   - repo: https://github.com/jorisroovers/gitlint
-    rev: v0.13.1
+    rev: v0.16.0
     hooks:
       - id: gitlint
         stages: [commit-msg]
