@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 set -eEu
 set -o pipefail
 
@@ -38,11 +38,15 @@ run_precommit() {
 try_precommit() {
   info 'Try local hooks'
   checks='
+    bundler-audit
     fasterer
+    markdownlint
+    protect-first-parent
     reek
     rubocop
     script-must-have-extension
     script-must-not-have-extension
+    shfmt
   '
   for check in ${checks}; do
     run pre-commit try-repo ./ "${check}" --all-files --verbose

@@ -3,6 +3,15 @@
 # which hooks are provided by this repo
 # for use by other git repos.
 
+- id: bundler-audit
+  name: Patch-level verification for bundler
+  description: Check for vulnerable gem versions and insecure sources
+  entry: run-bundle-audit
+  language: ruby
+  pass_filenames: false
+  files: Gemfile.lock
+  args: [--update]
+
 - id: check-mailmap
   name: Detect if an email address needs to be added to mailmap
   language: script
@@ -43,6 +52,21 @@
   entry: pre_commit_hooks/git-dirty
   language: script
 
+- id: markdownlint
+  name: Check markdown files
+  description: Check markdown files and flag style issues
+  entry: run-mdl
+  language: ruby
+  types: ['markdown']
+
+- id: protect-first-parent
+  name: Protect first parent
+  description: Protect first parent from foxtrot merges
+  entry: pre_commit_hooks/protect-first-parent
+  language: script
+  always_run: true
+  pass_filenames: false
+
 - id: reek
   name: Find ruby code smells
   description: Use reek to find ruby code smells
@@ -56,7 +80,6 @@
   entry: require-ascii.py
   language: python
   types: [text]
-  additional_dependencies: [chardet]
 
 - id: rubocop
   name: Check Ruby style with rubocop and rubocop-rspec
@@ -81,7 +104,6 @@
   language: script
   types: [shell]
   args: [-e, SC1091]
-  additional_dependencies: [shellcheck]
 
 - id: script-must-have-extension
   name: Non-executable shell script filename ends in .sh
@@ -102,18 +124,3 @@
   language: script
   entry: pre_commit_hooks/shfmt
   types: [shell]
-  args: ['-l', '-i', '2', '-ci']
-  additional_dependencies: [shfmt]
-
-- id: tslint
-  name: Run `tslint` on typescript files
-  entry: tslint
-  language: node
-  files: \.ts$
-  args: []
-  additional_dependencies: [
-    'typescript@3.7.5',
-    'tslint@5.18.0',
-    'tslint-no-unused-expression-chai@0.1.4',
-    'rxjs-tslint-rules@4.24.3'
-  ]

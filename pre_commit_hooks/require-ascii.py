@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 """
 require-ascii
@@ -8,25 +8,36 @@ require-ascii
 from __future__ import print_function
 
 import sys
-import chardet
 
 status = 0
 
+# https://theasciicode.com.ar/
+MAX_ASCII_CODE = 255
+
 for filename in sys.argv:
-    fh = open(filename, 'rb')
-    data = fh.read()
-    dict = chardet.detect(data)
-    fh.close
+    line_num = 0
+    with open(filename, 'r', encoding='UTF-8') as fh:
+        while True:
+            line_num += 1
+            try:
+                # @todo This can probably be enhanced to read byte-by-byte
+                # to report the offending column.
+                line = fh.readline()
+            except UnicodeDecodeError as e:
+                print(f"{filename}: line {line_num} " + str(e))
+                status = 1
 
-    if dict['encoding'] in (None, 'ascii'):
-        result = '[OK]'
-    else:
-        result = '[ERROR]'
-        status = 1
+            if not line:
+                break
 
-    # With `--verbose', pre-commit shows output regardless of exit status.
-    # Without `--verbose', pre-commit only shows output when status != 0.
-    print(result.ljust(8) + filename.ljust(50), end='')
-    print(dict)
+            col_num = 0
+            for char in line:
+                col_num += 1
+                if ord(char) > MAX_ASCII_CODE:
+                    print(
+                        f"{filename}: line {line_num} column {col_num} " +
+                        f"character \"{char}\" (decimal {ord(char)})"
+                        )
+                    status = 1
 
-exit(status)
+sys.exit(status)

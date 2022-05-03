@@ -3,43 +3,53 @@
 Git hooks to integrate with [pre-commit](http://pre-commit.com).
 
 
-## Table of contents
+<!--TOC-->
 
 - [Configure pre-commit](#configure-pre-commit)
 - [Two ways to invoke pre-commit](#two-ways-to-invoke-pre-commit)
 - [Available hooks](#available-hooks)
-  * [`check-mailmap`](#check-mailmap)
-  * [`fasterer`](#fasterer)
-  * [`forbid-binary`](#forbid-binary)
-  * [`git-check`](#git-check)
-  * [`git-dirty`](#git-dirty)
-  * [`reek`](#reek)
-  * [`require-ascii`](#require-ascii)
-  * [`rubocop`](#rubocop)
-  * [`semistandard`](#semistandard)
-  * [`script-must-have-extension`](#script-must-have-extension)
-  * [`script-must-not-have-extension`](#script-must-not-have-extension)
-  * [`shellcheck`](#shellcheck)
-  * [`shfmt`](#shfmt)
-  * [`tslint`](#tslint)
+  - [`bundler-audit`](#bundler-audit)
+  - [`check-mailmap`](#check-mailmap)
+  - [`fasterer`](#fasterer)
+  - [`forbid-binary`](#forbid-binary)
+  - [`forbid-space-in-indent`](#forbid-space-in-indent)
+  - [`git-check`](#git-check)
+  - [`git-dirty`](#git-dirty)
+  - [`markdownlint`](#markdownlint)
+  - [`protect-first-parent`](#protect-first-parent)
+  - [`reek`](#reek)
+  - [`require-ascii`](#require-ascii)
+  - [`rubocop`](#rubocop)
+  - [`semistandard`](#semistandard)
+  - [`script-must-have-extension`](#script-must-have-extension)
+  - [`script-must-not-have-extension`](#script-must-not-have-extension)
+  - [`shellcheck`](#shellcheck)
+  - [`shfmt`](#shfmt)
+  - [`tslint`](#tslint)
 - [Contributing](#contributing)
 - [Testing](#testing)
 - [License](#license)
 
+<!--TOC-->
+
 
 ## Configure pre-commit
+
+:warning: These hooks now require Python3.
 
 Add to `.pre-commit-config.yaml` in your git repo:
 
     - repo: https://github.com/jumanjihouse/pre-commit-hooks
-      sha: 1.10.2
+      rev: master  # or specific git tag
       hooks:
+        - id: bundler-audit
         - id: check-mailmap
         - id: fasterer
         - id: forbid-binary
         - id: forbid-space-in-indent
         - id: git-check  # Configure in .gitattributes
         - id: git-dirty  # Configure in .gitignore
+        - id: markdownlint # Configure in .mdlrc
         - id: reek
         - id: require-ascii
         - id: rubocop
@@ -65,9 +75,23 @@ to run the checks on-demand.
 
 ## Available hooks
 
+### `bundler-audit`
+
+**What it does**
+
+* Checks for vulnerable versions of gems in `Gemfile.lock`.
+* Checks for insecure gem sources (`http://`).
+* Allows ignoring certain advisories that have been manually worked around.
+* Prints advisory information.
+
+**More info**
+
+See https://github.com/rubysec/bundler-audit for details.
+
+
 ### `check-mailmap`
 
-#### What it does
+**What it does**
 
 Detect botched name/email translations in git history.
 
@@ -80,7 +104,7 @@ Reasons include:
 * not always written the same way
 * the author has multiple email addresses
 
-#### More info
+**More info**
 
 Sample output for good condition:
 
@@ -110,11 +134,11 @@ Sample output for bad condition:
 
 ### `fasterer`
 
-#### What it does
+**What it does**
 
 Suggest ways to improve speed of Ruby code.
 
-#### More info
+**More info**
 
 [`fasterer`](https://github.com/DamirSvrtan/fasterer)
 suggests speed improvements that you can check in detail at the
@@ -125,11 +149,11 @@ suggests speed improvements that you can check in detail at the
 
 ### `forbid-binary`
 
-#### What it does
+**What it does**
 
 Prevent binary files from being committed.
 
-#### More info
+**More info**
 
 Fail if a file appears to be a [binary filetype](https://pre-commit.com/#filtering-files-with-types).
 Override with an `exclude` regular expression,
@@ -138,11 +162,11 @@ such as the example [**here**](.pre-commit-config.yaml).
 
 ### `forbid-space-in-indent`
 
-#### What it does
+**What it does**
 
 Prevent files with spaces within indentation from being committed.
 
-#### More info
+**More info**
 
 Fail if a file contains spaces within indentation.
 Override with an `exclude` regular expression,
@@ -151,13 +175,13 @@ such as the example [**here**](.pre-commit-config.yaml).
 
 ### `git-check`
 
-#### What it does
+**What it does**
 
 Check both committed and uncommitted files for git conflict markers and
 whitespace errors according to `core.whitespace` and `conflict-marker-size`
 configuration in a git repo.
 
-#### More info
+**More info**
 
 This hook uses `git` itself to perform the checks.<br/>
 The git-scm book describes
@@ -172,12 +196,13 @@ Enabled by default:
 
 Disabled by default:
 
-* `indent-with-non-tab`, which looks for lines that begin with spaces instead of tabs
+* `indent-with-non-tab`, which
+  looks for lines that begin with spaces instead of tabs
   (and is controlled by the `tabwidth` option)
 * `tab-in-indent`, which looks for tabs in the indentation portion of a line
 * `cr-at-eol`, which looks for carriage returns at the end of a line
 
-#### Custom configuration (overrides)
+**Custom configuration (overrides)**
 
 The git documentation describes
 [**here**](https://git-scm.com/docs/git-config#git-config-corewhitespace)
@@ -195,29 +220,73 @@ Real-world examples of `.gitattributes` file to configure overrides per path:
 
 ### `git-dirty`
 
-#### What it does
+**What it does**
 
 During the pre-commit stage, do nothing.<br/>
 Otherwise, detect whether the git tree contains modified, staged, or untracked files.
 
-#### More info
+**More info**
 
 This is useful to run near the end of a CI process to
 see if a build step has modified the git tree in unexpected ways.
 
-#### Custom configuration (overrides)
+**Custom configuration (overrides)**
 
 The recommended place to persist the configuration is the `.gitignore` file,
 described [**here**](https://git-scm.com/docs/gitignore).
 
 
+### `markdownlint`
+
+**What it does**
+
+Check markdown files and flag style issues.
+
+**More info**
+
+[markdownlint](https://github.com/markdownlint/markdownlint)
+is a ruby tool that examines markdown files against various
+[style rules](https://github.com/markdownlint/markdownlint/blob/master/docs/RULES.md).
+
+**Custom configuration (overrides)**
+
+Provide `.mdlrc` in the top-level of your project git repo.
+
+For an annotated example of overrides, see in this project:
+
+* [`.mdlrc`](.mdlrc)
+* [`ci/jumanjistyle.rb`](ci/jumanjistyle.rb)
+
+
+### `protect-first-parent`
+
+**What it does**
+
+Helps to ensure the first-parent sequence of commits on the default branch
+is a true record of commits.
+
+This protection is probably best done as a pre-receive hook. However, central
+git repos like GitHub, GitLab, and so forth do not allow users to configure
+server-side hooks.
+
+This client-side hook fills the gap to help prevent foxtrot merges.
+
+**More info**
+
+- https://en.it1352.com/article/b9ff488428bd49d39f338d421bd1b8f9.html
+- https://bit-booster.blogspot.com/2016/02/no-foxtrots-allowed.html
+- https://devblog.nestoria.com/post/98892582763/maintaining-a-consistent-linear-history-for-git
+- https://dev.to/etcwilde/merge-trees-visualizing-git-repositories
+- https://pdfs.semanticscholar.org/a0e2/e630fc7b5bcf9e86c424a2551d0b76aec53a.pdf
+
+
 ### `reek`
 
-#### What it does
+**What it does**
 
 Detect code smells in Ruby code.
 
-#### More info
+**More info**
 
 [Reek](https://github.com/troessner/reek)
 is a tool that examines Ruby classes, modules and methods and reports any
@@ -232,12 +301,12 @@ There is also [this talk](https://www.youtube.com/watch?v=pazYe7WRWRU) from
 (there is also a [slide deck](http://talks.chastell.net/rubyconf-by-lt-2016/)
 if you prefer that).
 
-**Note:** You should not follow the suggestions blindly.
+**Note:** Do not follow the suggestions blindly.
 
 This hook uses the `identify` library of pre-commit to identify ruby scripts.
 If the file is a ruby script, then run reek against the file.
 
-#### Custom configuration (overrides)
+**Custom configuration (overrides)**
 
 The recommended place to persist the configuration is the `.reek` file,
 described [**here**](https://github.com/troessner/reek#configuration-options).
@@ -248,12 +317,13 @@ in the source code for individual overrides.
 
 ### `require-ascii`
 
-#### What it does
+**What it does**
 
-Requires that text files have ascii-encoding.
+Requires that text files have ascii-encoding, including the
+[extended ascii set](https://theasciicode.com.ar/).
 This is useful to detect files that have unicode characters.
 
-#### Custom configuration (overrides)
+**Custom configuration (overrides)**
 
 Use the [built-in overrides](https://pre-commit.com/#pre-commit-configyaml---hooks)
 from the pre-commit framework.
@@ -261,22 +331,25 @@ from the pre-commit framework.
 
 ### `rubocop`
 
-#### What it does
+**What it does**
 
 RuboCop is a Ruby static code analyzer. Out of the box it
 enforces many of the guidelines outlined in the community
 [Ruby Style Guide](https://github.com/bbatsov/ruby-style-guide).
 
-#### More info
+**More info**
 
 This hook uses the `identify` library of pre-commit to identify ruby scripts.
 If the file is a ruby script, then run rubocop against the file.
 Additionally, run rubocop-rspec against rspec files.
 
-#### Custom configuration (overrides)
+**Custom configuration (overrides)**
 
 Most aspects of rubocop behavior can be tweaked via various
 [configuration options](https://github.com/bbatsov/rubocop/blob/master/config/default.yml).
+
+Rubocop-performance is documented
+[here](https://github.com/rubocop-hq/rubocop-performance).
 
 Rubocop-rspec is documented
 [here](https://github.com/rubocop-rspec/rubocop-rspec).
@@ -291,6 +364,8 @@ Run [semistandard](https://github.com/standard/semistandard) against javascript 
 
 ### `script-must-have-extension`
 
+**What it does**
+
 The [Google shell style guide](https://google.github.io/styleguide/shell.xml#File_Extensions)
 states:
 
@@ -298,14 +373,13 @@ states:
 
 This hook checks for conformance.
 
-#### Default
+**Default**
 
 Filter on files that are both `shell` **and** `non-executable`.
 
     types: [shell, non-executable]
 
-
-#### Override
+**Custom configuration (overrides)**
 
 Suppose your local style guide is the opposite of the default.<br/>
 In other words, you require **executable** scripts to end with `.sh`.<br/>
@@ -324,6 +398,8 @@ provide context for the override.
 
 ### `script-must-not-have-extension`
 
+**What it does**
+
 The [Google shell style guide](https://google.github.io/styleguide/shell.xml#File_Extensions)
 states:
 
@@ -331,14 +407,13 @@ states:
 
 This hook checks for conformance.
 
-#### Default
+**Default**
 
 Filter on files that are both `shell` **and** `executable`.
 
     types: [shell, executable]
 
-
-#### Override
+**Custom configuration (overrides)**
 
 You can use this hook to forbid filename extensions on other types of files.<br/>
 Put something like this in your `.pre-commit-config.yaml`:
@@ -360,11 +435,11 @@ provide context for the override.
 
 ### `shellcheck`
 
-#### What it does
+**What it does**
 
 Run shellcheck against scripts.
 
-#### More info
+**More info**
 
 This hook uses the `identify` library of pre-commit to identify shell scripts.
 If the file is a shell script, then run shellcheck against the file.
@@ -378,20 +453,18 @@ Override locally with the `args` parameter in `.pre-commit-config.yaml`.
 
 ### `shfmt`
 
-#### What it does
+**What it does**
 
-Run `shfmt` against scripts with args.
+Run `shfmt -w` against scripts with args.
 
-#### More info
+**More info**
 
 This hook uses the `identify` library of pre-commit to identify shell scripts.
 If the file is a shell script, then run shfmt against the file.
 
-By default, this hooks passes `-l -i 2 -ci` to shfmt to conform to the
-[Google Shell Style Guide](https://google.github.io/styleguide/shell.xml).
-Override locally with the `args` parameter in `.pre-commit-config.yaml`.
+Override locally with `.editorconfig`.
 
-:warning: The `shfmt` hook requires
+:warning: The `shfmt` hook requires a recent version of
 [shfmt](https://github.com/mvdan/sh/releases).
 
 
