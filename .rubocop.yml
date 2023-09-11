@@ -35,3 +35,9 @@ Style/TrailingCommaInHashLiteral:
 
 Style/WordArray:
   EnforcedStyle: brackets
+
+Rails/UniqueValidationWithoutIndex: # does nothing if db/schema.rb does not exist
+  Enabled: false
+
+Rails/ThreeStateBooleanColumn:
+  Enabled: false
